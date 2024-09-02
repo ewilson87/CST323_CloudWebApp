@@ -1,0 +1,141 @@
+﻿@model CloudWebApp.Models.UpdateProfileViewModel
+@{
+    ViewData["Title"] = $"{Model.Username}'s Profile";
+}
+
+<h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+@if (TempData["StatusMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["StatusMessage"]
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header text-center">
+                <h4>Update Profile</h4>
+            </div>
+            <div class="card-body">
+                <form id="profile-form" asp-action="UpdateProfile" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="Username" />
+                    <div class="form-group">
+                        <label asp-for="Email" class="control-label"></label>
+                        <input asp-for="Email" class="form-control" readonly />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                    <div class="form-group mt-3 text-center">
+                        <button id="edit-profile-button" type="button" class="btn btn-primary">Edit Profile</button>
+                        <button id="save-profile-button" type="submit" class="btn btn-success" style="display:none;">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-2 d-flex justify-content-center align-items-center">
+        <div class="vr h-100"></div>
+    </div>
+
+    <div class="col-md-5">
+        <div class="card mb-4">
+            <div class="card-header text-center">
+                <h4>Password Management</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <button id="show-password-form" class="btn btn-secondary">Change Password</button>
+                </div>
+                <form id="change-password-form" asp-action="ChangePassword" method="post" style="display:none;">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group mt-3">
+                        <label for="CurrentPassword" class="control-label">Current Password</label>
+                        <input type="password" id="CurrentPassword" name="CurrentPassword" class="form-control" />
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="NewPassword" class="control-label">New Password</label>
+                        <input type="password" id="NewPassword" name="NewPassword" class="form-control" />
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="ConfirmPassword" class="control-label">Confirm New Password</label>
+                        <input type="password" id="ConfirmPassword" name="ConfirmPassword" class="form-control" />
+                    </div>
+                    <div class="form-group mt-3 text-center">
+                        <input type="submit" value="Change Password" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header text-center">
+                <h4>Delete Account</h4>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <button id="show-delete-form" class="btn btn-danger">Delete Account</button>
+                </div>
+                <div id="delete-account-warning" style="display:none;">
+                    <div class="alert alert-warning mt-3">
+                        <strong>Warning!</strong> This action cannot be undone. All your data will be permanently deleted.
+                    </div>
+                    <form id="delete-account-form" asp-action="DeleteAccount" method="post">
+                        <div class="form-group mt-3">
+                            <label for="DeletePassword" class="control-label">Current Password</label>
+                            <input type="password" id="DeletePassword" name="Password" class="form-control" required />
+                        </div>
+                        <div class="form-check mt-3">
+                            <input type="checkbox" id="confirm-delete" class="form-check-input" required />
+                            <label class="form-check-label" for="confirm-delete">
+                                I understand that this action is irreversible and I want to delete my account
+                            </label>
+                        </div>
+                        <div class="form-group mt-3 text-center">
+                            <input type="submit" value="Permanently Delete My Account" class="btn btn-danger" id="final-delete-button" disabled />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $('#edit-profile-button').click(function () {
+                $('#Email').removeAttr('readonly');
+                $(this).hide();
+                $('#save-profile-button').show();
+            });
+
+            $('#show-password-form').click(function () {
+                $('#change-password-form').toggle();
+                $(this).text(function(i, text){
+                    return text === "Change Password" ? "Hide Password Form" : "Change Password";
+                });
+            });
+
+            $('#show-delete-form').click(function () {
+                $('#delete-account-warning').toggle();
+                $(this).text(function(i, text){
+                    return text === "Delete Account" ? "Hide Delete Account Form" : "Delete Account";
+                });
+            });
+
+            $('#confirm-delete').change(function() {
+                $('#final-delete-button').prop('disabled', !this.checked);
+            });
+
+            $('#delete-account-form').submit(function(e) {
+                if (!confirm('Are you absolutely sure you want to delete your account? This action CANNOT be undone!')) {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+}

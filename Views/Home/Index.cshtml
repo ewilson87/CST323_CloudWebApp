@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to My Random Image Explorer!</h1>
+        <p class="lead">Discover the world through images with my Unsplash-powered random image generator.</p>
+        <hr class="my-4">
+        <div class="alert alert-info" role="alert">
+            <h4 class="alert-heading">Created by Evan Wilson</h4>
+            <p class="mb-0">August 2024</p>
+        </div>
+        <p>This application allows you to explore a vast collection of high-quality images from Unsplash based on your keywords. Whether you're seeking inspiration, researching, or just curious, my tool provides a window into a world of diverse visuals.</p>
+        <p>Here's what you can do:</p>
+        <ul>
+            <li>Enter any keyword that interests you</li>
+            <li>Get a random, high-quality image related to your keyword</li>
+        </ul>
+        <p>Ready to start your visual journey?</p>
+        <a class="btn btn-primary btn-lg" asp-area="" asp-controller="Home" asp-action="Login" role="button">Get Started</a>
+    </div>
+</div>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>About Unsplash</h3>
+            <p>Unsplash is a platform that provides high-quality, royalty-free images shared by photographers from around the world. My application leverages the Unsplash API to bring you a diverse range of stunning visuals at your fingertips.</p>
+        </div>
+        <div class="col-md-6">
+            <h3>How It Works</h3>
+            <p>Once you log in, you'll be able to enter keywords into the search bar. My application then communicates with the Unsplash API to fetch a random image related to your keyword. It's a simple yet powerful way to explore visual content!</p>
+        </div>
+    </div>
+</div>

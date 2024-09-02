@@ -1,0 +1,52 @@
+﻿@model CloudWebApp.Models.UserHomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<div class="container mt-4">
+    <h1 class="display-4">Welcome, @Model.Username!</h1>
+    <p class="lead">Enter a keyword to see a random image associated with it.</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <form id="image-search-form">
+                <div class="input-group mb-3">
+                    <input type="text" id="keyword" class="form-control" placeholder="Enter a keyword" required>
+                    <button class="btn btn-primary" type="submit">Search Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <img id="random-image" src="" alt="Random Image" class="img-fluid d-none">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function() {
+            $('#image-search-form').submit(function(e) {
+                e.preventDefault();
+                var keyword = $('#keyword').val();
+                fetchRandomImage(keyword);
+            });
+
+            function fetchRandomImage(keyword) {
+                $.ajax({
+                    url: '/User/GetRandomImage',
+                    type: 'GET',
+                    data: { keyword: keyword },
+                    success: function(data) {
+                        $('#random-image').attr('src', data.imageUrl).removeClass('d-none');
+                    },
+                    error: function() {
+                        alert('Error fetching image. Please try again.');
+                    }
+                });
+            }
+        });
+    </script>
+}
