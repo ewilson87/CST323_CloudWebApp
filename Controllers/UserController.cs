@@ -201,7 +201,7 @@ namespace CloudWebApp.Controllers
                 }
             }
 
-            // We're not updating the username, but we're ensuring it's set in the model
+            //store username to model for updating profile
             model.Username = user.UserName;
 
             await _signInManager.RefreshSignInAsync(user);
