@@ -13,8 +13,8 @@ Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.File("logs/myapp.txt", rollingInterval: RollingInterval.Day)
+    .WriteTo.Console() 
+    .WriteTo.File(GetLogFilePath(), rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 try
@@ -120,4 +120,30 @@ catch (Exception ex)
 finally
 {
     Log.CloseAndFlush();
+}
+
+static string GetLogFilePath()
+{
+    // Check for Heroku
+    var dynoName = Environment.GetEnvironmentVariable("DYNO");
+    if (!string.IsNullOrEmpty(dynoName))
+    {
+        return "app.log";  // Heroku uses stdout, so this won't actually create a file
+    }
+
+    // Check for Google Cloud
+    var gaeInstance = Environment.GetEnvironmentVariable("GAE_INSTANCE");
+    if (!string.IsNullOrEmpty(gaeInstance))
+    {
+        return "/tmp/app.log";  // Google Cloud App Engine writable tmp directory
+    }
+
+    // Azure App Service
+    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")))
+    {
+        return "D:\\home\\LogFiles\\Application\\myapp.txt";
+    }
+
+    // Local development
+    return "logs/myapp.txt";
 }
