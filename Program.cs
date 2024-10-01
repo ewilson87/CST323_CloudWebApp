@@ -15,6 +15,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .WriteTo.Console() 
     .WriteTo.File(GetLogFilePath(), rollingInterval: RollingInterval.Day)
+    .WriteTo.AzureAppServiceFile() // Add this line
     .CreateLogger();
 
 try
