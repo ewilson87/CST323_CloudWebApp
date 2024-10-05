@@ -19,19 +19,41 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '3.1'
+          dotnet-version: '8.0'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
+        continue-on-error: true
+
+      - name: Output build logs
+        run: Get-ChildItem -Path ${{ github.workspace }} -Filter *.log -Recurse | ForEach-Object { Get-Content $_.FullName }
+
+      - name: Check build status
+        if: steps.build.outcome == 'failure'
+        run: exit 1
+
+      - name: Output dotnet info
+        run: dotnet --info
+     
+      - name: List project files
+        run: Get-ChildItem -Path ${{ github.workspace }} -Filter *.csproj -Recurse | ForEach-Object { $_.FullName }
+
+      - name: Show current directory and contents
+        run: |
+          Write-Host "Current directory: $pwd"
+          Get-ChildItem -Path . -Recurse
 
       - name: dotnet publish
-        run: dotnet publish -c Release -o ${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Release -o "$env:DOTNET_ROOT\myapp"
+
+      - name: List published files
+        run: Get-ChildItem -Path "$env:DOTNET_ROOT\myapp" -Recurse
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: .net-app
-          path: ${{env.DOTNET_ROOT}}/myapp
+          path: ${{ env.DOTNET_ROOT }}\myapp
 
   deploy:
     runs-on: windows-latest
@@ -45,6 +67,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: .net-app
+
+      - name: List contents of downloaded artifact
+        run: Get-ChildItem -Path ${{ github.workspace }} -Recurse
       
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -54,3 +79,9 @@ jobs:
           slot-name: 'Production'
           package: .
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_B54720DE8B8C484988B4E8E55B146F86 }}
+
+      - name: Output deployment logs
+        if: failure()
+        run: |
+          Write-Host "Deployment failed. Outputting logs:"
+          Get-ChildItem -Path D:\home\site\deployments\log -Filter *.log -Recurse | ForEach-Object { Get-Content $_.FullName }
