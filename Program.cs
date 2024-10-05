@@ -131,14 +131,14 @@ static string GetLogFilePath()
     var dynoName = Environment.GetEnvironmentVariable("DYNO");
     if (!string.IsNullOrEmpty(dynoName))
     {
-        return "app.log";  // Heroku uses stdout, so this won't actually create a file
+        return "app.log";  
     }
 
     // Check for Google Cloud
     var gaeInstance = Environment.GetEnvironmentVariable("GAE_INSTANCE");
     if (!string.IsNullOrEmpty(gaeInstance))
     {
-        return "/tmp/app.log";  // Google Cloud App Engine writable tmp directory
+        return "/tmp/app.log"; 
     }
 
     // Azure App Service
