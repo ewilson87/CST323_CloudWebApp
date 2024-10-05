@@ -7,9 +7,38 @@ steps:
   - name: 'ubuntu'
     args: ['cat', 'Dockerfile']
 
+  # Print environment variables
+  - name: 'ubuntu'
+    args: ['env']
+
   # Build the container image
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/${REPO_NAME,,}:$COMMIT_SHA', '.']
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      docker build -t gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA .
+
+  # Push the container image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      docker push gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA
+
+  # Deploy container image to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'bash'
+    args:
+    - '-c'
+    - |
+      gcloud run deploy $(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]') \
+        --image gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA \
+        --region us-central1 \
+        --platform managed
 
 options:
   logging: CLOUD_LOGGING_ONLY
+
+timeout: '1800s'  # Set a 30-minute timeout
