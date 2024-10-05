@@ -11,20 +11,33 @@ using Microsoft.Extensions.Logging.AzureAppServices;
 using Serilog.Sinks.GoogleCloudLogging;
 
 // Configure Serilog
-Log.Logger = new LoggerConfiguration()
+var logConfig = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.GoogleCloudLogging()
-    .WriteTo.File(GetLogFilePath(), rollingInterval: RollingInterval.Day)
-    .CreateLogger();
+    .WriteTo.Console();
+
+// Add Google Cloud Logging sink if running on Google Cloud
+if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("K_SERVICE")))
+{
+    logConfig.WriteTo.GoogleCloudLogging();
+}
+
+// Add file logging based on the environment
+logConfig.WriteTo.File(GetLogFilePath(), rollingInterval: RollingInterval.Day);
+
+Log.Logger = logConfig.CreateLogger();
 
 try
 {
     Log.Information("Starting web application");
     var builder = WebApplication.CreateBuilder(args);
-    builder.Logging.AddAzureWebAppDiagnostics();
+
+    // Add Azure logging only if running on Azure
+    if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WEBSITE_SITE_NAME")))
+    {
+        builder.Logging.AddAzureWebAppDiagnostics();
+    }
 
     // Add Serilog to the application
     builder.Host.UseSerilog();
@@ -137,7 +150,7 @@ static string GetLogFilePath()
     }
 
     // Check for Google Cloud
-    var gaeInstance = Environment.GetEnvironmentVariable("GAE_INSTANCE");
+    var gaeInstance = Environment.GetEnvironmentVariable("K_SERVICE");
     if (!string.IsNullOrEmpty(gaeInstance))
     {
         return "/tmp/app.log"; 
