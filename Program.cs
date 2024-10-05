@@ -8,13 +8,15 @@ using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using Serilog.Events;
 using Microsoft.Extensions.Logging.AzureAppServices;
+using Serilog.Sinks.GoogleCloudLogging;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
     .Enrich.FromLogContext()
-    .WriteTo.Console() 
+    .WriteTo.Console()
+    .WriteTo.GoogleCloudLogging()
     .WriteTo.File(GetLogFilePath(), rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
