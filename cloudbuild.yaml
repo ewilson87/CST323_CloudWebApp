@@ -17,7 +17,7 @@ steps:
     args:
     - '-c'
     - |
-      docker build -t gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA .
+      docker build -t gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]' | tr '_' '-'):$COMMIT_SHA .
 
   # Push the container image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -25,7 +25,7 @@ steps:
     args:
     - '-c'
     - |
-      docker push gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA
+      docker push gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]' | tr '_' '-'):$COMMIT_SHA
 
   # Deploy container image to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -33,8 +33,8 @@ steps:
     args:
     - '-c'
     - |
-      gcloud run deploy $(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]') \
-        --image gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]'):$COMMIT_SHA \
+      gcloud run deploy $(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]' | tr '_' '-') \
+        --image gcr.io/$PROJECT_ID/$(echo ${REPO_NAME} | tr '[:upper:]' '[:lower:]' | tr '_' '-'):$COMMIT_SHA \
         --region us-central1 \
         --platform managed
 
