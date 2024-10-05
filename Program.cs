@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using Serilog.Events;
+using Microsoft.Extensions.Logging.AzureAppServices;
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
@@ -19,7 +20,9 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
+    Log.Information("Starting web application");
     var builder = WebApplication.CreateBuilder(args);
+    builder.Logging.AddAzureWebAppDiagnostics();
 
     // Add Serilog to the application
     builder.Host.UseSerilog();
