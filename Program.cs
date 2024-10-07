@@ -10,6 +10,8 @@ using Serilog.Events;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using Serilog.Sinks.GoogleCloudLogging;
 
+//comment change to commit to trigger build
+
 // Configure Serilog
 var logConfig = new LoggerConfiguration()
     .MinimumLevel.Debug()
